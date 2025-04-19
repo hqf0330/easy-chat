@@ -2,6 +2,8 @@ package logic
 
 import (
 	"context"
+	"easy-chat/apps/user/models"
+	"github.com/jinzhu/copier"
 
 	"easy-chat/apps/user/rpc/internal/svc"
 	"easy-chat/apps/user/rpc/user"
@@ -24,7 +26,28 @@ func NewFindUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FindUser
 }
 
 func (l *FindUserLogic) FindUser(in *user.FindUserReq) (*user.FindUserResp, error) {
-	// todo: add your logic here and delete this line
+	var userEntities []*models.Users
+	var err error
 
-	return &user.FindUserResp{}, nil
+	if in.Phone != "" {
+		userEntity, err := l.svcCtx.UserModel.FindByPhone(l.ctx, in.Phone)
+		if err == nil {
+			userEntities = append(userEntities, userEntity)
+		}
+	} else if len(in.Ids) > 0 {
+		userEntities, err = l.svcCtx.UserModel.ListByIds(l.ctx, in.Ids)
+	} else if in.Name != "" {
+		userEntities, err = l.svcCtx.UserModel.ListByName(l.ctx, in.Name)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	var resp []*user.UserEntity
+	_ = copier.Copy(&resp, userEntities)
+
+	return &user.FindUserResp{
+		User: resp,
+	}, nil
 }
