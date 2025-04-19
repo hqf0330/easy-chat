@@ -4,3 +4,15 @@ Etcd:
   Hosts:
   - 192.168.31.103:3379
   Key: user.rpc
+
+MySql:
+  DataSource: root:easy-chat@tcp(192.168.31.103:13306)/easychat?charset=utf8mb4&parseTime=True&loc=Local
+
+Cache:
+  Host: 192.168.31.103:16379
+  Type: node
+  Pass: easy-chat
+
+Jwt:
+  AccessSecret: binghu
+  AccessExpire: 8640000
